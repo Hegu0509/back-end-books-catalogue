@@ -1,13 +1,14 @@
 package com.unir.books.catalogue.utils;
 
+import com.unir.books.catalogue.controller.model.BookDto;
+import com.unir.books.catalogue.controller.model.GetBookResponseDto;
+import com.unir.books.catalogue.repository.BookJpaRepository;
+import com.unir.books.catalogue.repository.ImageJpaRepository;
+import com.unir.books.catalogue.repository.model.Book;
 import com.unir.supplies.orders.controller.model.GetSupplyResponseDto;
 import com.unir.supplies.orders.controller.model.SpecificationDto;
-import com.unir.supplies.orders.controller.model.SupplyDto;
 import com.unir.supplies.orders.controller.model.WriteSupplyRequestDto;
 import com.unir.supplies.orders.exception.SupplyNotFoundException;
-import com.unir.supplies.orders.repository.ImageJpaRepository;
-import com.unir.supplies.orders.repository.SpecificationJpaRepository;
-import com.unir.supplies.orders.repository.SupplyJpaRepository;
 import com.unir.supplies.orders.repository.model.Supply;
 import com.unir.supplies.orders.repository.model.SupplyImage;
 import com.unir.supplies.orders.repository.model.SupplySpecification;
@@ -20,36 +21,36 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class SupplyMapper {
+public class BookMapper {
 
-    private final SupplyJpaRepository supplyJpaRepository;
-    private final SpecificationJpaRepository specificationJpaRepository;
+    private final BookJpaRepository bookJpaRepository;
     private final ImageJpaRepository imageJpaRepository;
 
-    public List<SupplyDto> asSupplyDtoList(List<Supply> supplies) {
-        return supplies.stream()
-                .map(supply -> SupplyDto.builder()
-                        .id(supply.getId())
-                        .name(supply.getName())
-                        .description(supply.getDescription())
-                        .type(supply.getType())
-                        .price(supply.getPrice().doubleValue())
-                        .stock(supply.getStock())
+    public List<BookDto> asBookDtoList(List<Book> books) {
+        return books.stream()
+                .map(book -> BookDto.builder()
+                        .id(book.getId())
+                        .title(book.getTitle())
+                        .isbn(book.getIsbn())
+                        .description(book.getDescription())
+                        .valoracion(book.getValoracion())
+                        .stock(book.getStock())
                         .build())
                 .toList();
     }
 
-    public GetSupplyResponseDto asGetSupplyResponseDto(Supply supply) {
-        return GetSupplyResponseDto.builder()
-                .id(supply.getId())
-                .name(supply.getName())
-                .description(supply.getDescription())
-                .fullDescription(supply.getFullDescription())
-                .type(supply.getType())
-                .price(supply.getPrice().doubleValue())
-                .stock(supply.getStock())
-                .specificationDtos(supply.getSpecificationsAsList())
-                .images(supply.getImageUrls())
+    public GetBookResponseDto asGetBookResponseDto(Book book) {
+        return GetBookResponseDto.builder()
+                .id(book.getId())
+                .title(book.getTitle())
+                .description(book.getDescription())
+                .isbn(book.getIsbn())
+                .valoracion(book.getValoracion())
+                .stock(book.getStock())
+                .author(book.getAuthor() != null ? book.getAuthor().getName() : null)
+                .publisher(book.getPublisher().getName())
+                .category(book.getCategory().getName())
+                .images(book.getImageUrls())
                 .build();
     }
 

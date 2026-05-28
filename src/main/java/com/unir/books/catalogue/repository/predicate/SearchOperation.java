@@ -1,4 +1,4 @@
-package com.unir.supplies.orders.repository.predicate;
+package com.unir.books.catalogue.repository.predicate;
 
 public enum SearchOperation {
     GREATER_THAN,
