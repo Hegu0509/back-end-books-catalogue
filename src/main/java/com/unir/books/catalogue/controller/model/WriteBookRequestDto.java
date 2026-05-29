@@ -1,5 +1,6 @@
 package com.unir.books.catalogue.controller.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -59,6 +60,7 @@ public class WriteBookRequestDto implements Serializable {
     public Long categoryId;
 
     @JsonProperty("publicationDate")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     public LocalDate publicationDate;
 
     @JsonProperty("edition")

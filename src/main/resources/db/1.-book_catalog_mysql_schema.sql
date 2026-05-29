@@ -64,9 +64,9 @@ CREATE TABLE books (
     description TEXT NULL,
     short_description VARCHAR(500) NULL,
 
-    author_id BIGINT UNSIGNED NOT NULL,
-    publisher_id BIGINT UNSIGNED NOT NULL,
-    category_id BIGINT UNSIGNED NOT NULL,
+    author_id BIGINT UNSIGNED,
+    publisher_id BIGINT UNSIGNED,
+    category_id BIGINT UNSIGNED,
 
     publication_date DATE NULL,
     edition VARCHAR(80) NULL,

@@ -4,6 +4,7 @@ import com.unir.books.catalogue.controller.model.GetBookResponseDto;
 import com.unir.books.catalogue.controller.model.GetBooksResponseDto;
 import com.unir.books.catalogue.controller.model.WriteBookRequestDto;
 import com.unir.books.catalogue.service.CreateBooksService;
+import com.unir.books.catalogue.service.DeleteBooksService;
 import com.unir.books.catalogue.service.GetBooksService;
 import com.unir.books.catalogue.service.ModifyBooksService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class BooksController {
     private final GetBooksService getBooksService;
     private final CreateBooksService createBooksService;
     private final ModifyBooksService modifyBooksService;
+    private final DeleteBooksService deleteBooksService;
 
     @GetMapping("books")
     public ResponseEntity<GetBooksResponseDto> getBooks() {
@@ -47,6 +49,12 @@ public class BooksController {
             @PathVariable Long bookId,
             @RequestBody String jsonPart) {
         return ResponseEntity.ok(modifyBooksService.modifyBook(bookId, jsonPart));
+    }
+
+    @DeleteMapping("books/{bookId}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+        deleteBooksService.deleteBook(bookId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -24,8 +24,6 @@ public class BookMapper {
     private final AuthorJpaRepository authorJpaRepository;
     private final PublisherJpaRepository publisherJpaRepository;
     private  final CategoryJpaRepository categoryJpaRepository;
-    private final ImageJpaRepository imageJpaRepository;
-
     public List<BookDto> asBookDtoList(List<Book> books) {
         return books.stream()
                 .map(book -> BookDto.builder()
@@ -50,9 +48,39 @@ public class BookMapper {
                 .stock(book.getStock())
                 .price(book.getPrice())
                 .author(book.getAuthor() != null ? book.getAuthor().getName() : null)
-                .publisher(book.getPublisher().getName())
+                .publisher(book.getPublisher().getName() != null ? book.getPublisher().getName() : null)
                 .category(book.getCategory().getName())
                 .images(book.getImageUrls())
+                .build();
+    }
+
+    public WriteBookRequestDto asWriteBookRequestDto(Book book) {
+        return WriteBookRequestDto.builder()
+                .isbn(book.getIsbn())
+                .title(book.getTitle())
+                .description(book.getDescription())
+                .shortDescription(book.getShortDescription())
+                .authorId(book.getAuthor() != null ? book.getAuthor().getId() : null)
+                .publisherId(book.getPublisher() != null ? book.getPublisher().getId() : null)
+                .categoryId(book.getCategory() != null ? book.getCategory().getId() : null)
+                .publicationDate(book.getPublicationDate())
+                .edition(book.getEdition())
+                .language(book.getLanguage())
+                .format(book.getFormat())
+                .pages(book.getPages())
+                .price(book.getPrice())
+                .stock(book.getStock())
+                .images(book.getImages() != null
+                        ? book.getImages().stream()
+                        .map(image -> ImageDto.builder()
+                                .bookId(book.getId())
+                                .imageUrl(image.getImageUrl())
+                                .imageType(image.getImageType())
+                                .imageOrder(image.getImageOrder())
+                                .altText(image.getAltText())
+                                .build())
+                        .toList()
+                        : new ArrayList<>())
                 .build();
     }
 
@@ -60,27 +88,26 @@ public class BookMapper {
         Book oldBook = bookJpaRepository.findById(bookId).orElseThrow(
                 () -> new BookNotFoundException("Book with ID " + bookId + " not found.")
         );
-        return Book.builder()
-                .isbn(bookDto.getIsbn())
-                .title(bookDto.getTitle())
-                .description(bookDto.getDescription())
-                .shortDescription(bookDto.getShortDescription())
-                .publicationDate(bookDto.getPublicationDate())
-                .edition(bookDto.getEdition())
-                .language(bookDto.getLanguage())
-                .format(bookDto.getFormat())
-                .pages(bookDto.getPages())
-                .price(bookDto.getPrice() != null ? bookDto.getPrice() : BigDecimal.ZERO)
-                .stock(bookDto.getStock() != null ? bookDto.getStock() : 0)
-                .author(getAuthorFromDto(bookDto.getAuthorId()))
-                .publisher(getPublisherFromDto(bookDto.getPublisherId()))
-                .category(getCategoryFromDto(bookDto.getCategoryId()))
-                .images(getImagesFromDto(oldBook, bookDto.getImages()))
-                .visible(oldBook.getVisible())
-                .valoracion(oldBook.getValoracion())
-                .createdAt(oldBook.getCreatedAt())
-                .updatedAt(java.time.LocalDateTime.now())
-                .build();
+        oldBook.setIsbn(bookDto.getIsbn());
+        oldBook.setTitle(bookDto.getTitle());
+        oldBook.setDescription(bookDto.getDescription());
+        oldBook.setShortDescription(bookDto.getShortDescription());
+        oldBook.setPublicationDate(bookDto.getPublicationDate());
+        oldBook.setEdition(bookDto.getEdition());
+        oldBook.setLanguage(bookDto.getLanguage());
+        oldBook.setFormat(bookDto.getFormat());
+        oldBook.setPages(bookDto.getPages());
+        oldBook.setPrice(bookDto.getPrice() != null ? bookDto.getPrice() : BigDecimal.ZERO);
+        oldBook.setStock(bookDto.getStock() != null ? bookDto.getStock() : 0);
+        oldBook.setAuthor(getAuthorFromDto(bookDto.getAuthorId()));
+        oldBook.setPublisher(getPublisherFromDto(bookDto.getPublisherId()));
+        oldBook.setCategory(getCategoryFromDto(bookDto.getCategoryId()));
+        oldBook.setUpdatedAt(java.time.LocalDateTime.now());
+
+        oldBook.getImages().clear();
+        bookJpaRepository.flush();
+        oldBook.getImages().addAll(getImagesFromDto(oldBook, bookDto.getImages()));
+        return oldBook;
     }
 
     public Book asBook(GetBookResponseDto getBookResponseDto) {
@@ -113,12 +140,14 @@ public class BookMapper {
         return categoryJpaRepository.findById(categoryId).orElseThrow(() -> new AuthorNotFoundException("Category not found with id: " + categoryId));
     }
 
-    private List<Image> getImagesFromDto(Book oldBook, List<ImageDto> imagesDto) {
-        imageJpaRepository.deleteByBookId(oldBook.getId());
+    private List<Image> getImagesFromDto(Book book, List<ImageDto> imagesDto) {
         List<Image> images = new ArrayList<>();
+        if (imagesDto == null) {
+            return images;
+        }
         imagesDto.forEach(image -> {
             Image imageModified = Image.builder()
-                    .book(oldBook)
+                    .book(book)
                     .imageUrl(image.getImageUrl() != null && !image.getImageUrl().isEmpty() ? image.getImageUrl() : "Sin imagen")
                     .imageType(image.getImageType() != null ? image.getImageType() : "cover")
                     .imageOrder(image.getImageOrder()!= null ? image.getImageOrder() : null)

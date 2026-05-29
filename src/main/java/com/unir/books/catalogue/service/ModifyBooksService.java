@@ -23,33 +23,28 @@ public class ModifyBooksService {
 
     private final BookJpaRepository bookJpaRepository;
     private final BookMapper bookMapper;
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public GetBookResponseDto modifyBook(Long bookId, WriteBookRequestDto bookDto) {
-        Book modifiedBook= bookMapper.asBook(bookId, bookDto);
-        modifiedBook.setId(bookId);
-        Book updatedBook= bookJpaRepository.save(modifiedBook);
+        Book modifiedBook = bookMapper.asBook(bookId, bookDto);
+        Book updatedBook = bookJpaRepository.save(modifiedBook);
         return bookMapper.asGetBookResponseDto(updatedBook);
     }
 
     @Transactional
     public GetBookResponseDto modifyBook(Long bookId, String jsonPart) {
-        //PATCH se implementa en este caso mediante Merge Patch: https://datatracker.ietf.org/doc/html/rfc7386
-        GetBookResponseDto book = bookMapper
-                .asGetBookResponseDto(
-                        bookJpaRepository
-                                .findById(bookId)
-                                .orElseThrow(() -> new BookNotFoundException("Book with ID " + bookId + " not found.")));
+        Book currentBook = bookJpaRepository
+                .findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException("Book with ID " + bookId + " not found."));
         try {
             JsonNode patch = objectMapper.readTree(jsonPart);
-            JsonNode actualBook = objectMapper.valueToTree(book);
-            JsonMergePatch mergePatch = JsonMergePatch.fromJson(patch); // ✅ Desde el patch entrante
-            // Apply the patch to the actual supply
-            JsonNode patchedSupplyNode = mergePatch.apply(actualBook); // ✅ Aplicando al supply actual
-            GetBookResponseDto patchedBook = objectMapper.treeToValue(patchedSupplyNode, GetBookResponseDto.class);
-            patchedBook.setId(bookId);
-            Book savedBook = bookJpaRepository.save(bookMapper.asBook(patchedBook));
+            WriteBookRequestDto currentBookDto = bookMapper.asWriteBookRequestDto(currentBook);
+            JsonNode actualBook = objectMapper.valueToTree(currentBookDto);
+            JsonMergePatch mergePatch = JsonMergePatch.fromJson(patch);
+            JsonNode patchedBookNode = mergePatch.apply(actualBook);
+            WriteBookRequestDto patchedBook = objectMapper.treeToValue(patchedBookNode, WriteBookRequestDto.class);
+            Book savedBook = bookJpaRepository.save(bookMapper.asBook(bookId, patchedBook));
             return bookMapper.asGetBookResponseDto(savedBook);
         } catch (JsonProcessingException | JsonPatchException e) {
             log.error("Error processing JSON patch for book ID {}: {}", bookId, e.getMessage(), e);
