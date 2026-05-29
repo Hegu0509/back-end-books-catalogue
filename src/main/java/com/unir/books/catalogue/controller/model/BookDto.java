@@ -17,6 +17,7 @@ import java.math.BigDecimal;
         "description",
         "isbn",
         "valoracion",
+        "price",
         "stock"
 })
 @Getter
@@ -36,6 +37,8 @@ public class BookDto implements Serializable {
     public String isbn;
     @JsonProperty("valoracion")
     public BigDecimal valoracion;
+    @JsonProperty("price")
+    public BigDecimal price;
     @JsonProperty("stock")
     public Integer stock;
 }

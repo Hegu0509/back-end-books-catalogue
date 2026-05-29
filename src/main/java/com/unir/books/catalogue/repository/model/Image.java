@@ -25,7 +25,6 @@ public class Image {
     @Column(name = "image_url", length = 1000, nullable = false)
     private String imageUrl;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "image_type", length = 80, nullable = false)
     private String imageType;
 

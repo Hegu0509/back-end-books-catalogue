@@ -5,19 +5,10 @@ import com.unir.books.catalogue.controller.model.GetBookResponseDto;
 import com.unir.books.catalogue.repository.BookJpaRepository;
 import com.unir.books.catalogue.repository.ImageJpaRepository;
 import com.unir.books.catalogue.repository.model.Book;
-import com.unir.supplies.orders.controller.model.GetSupplyResponseDto;
-import com.unir.supplies.orders.controller.model.SpecificationDto;
-import com.unir.supplies.orders.controller.model.WriteSupplyRequestDto;
-import com.unir.supplies.orders.exception.SupplyNotFoundException;
-import com.unir.supplies.orders.repository.model.Supply;
-import com.unir.supplies.orders.repository.model.SupplyImage;
-import com.unir.supplies.orders.repository.model.SupplySpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -35,6 +26,7 @@ public class BookMapper {
                         .description(book.getDescription())
                         .valoracion(book.getValoracion())
                         .stock(book.getStock())
+                        .price(book.getPrice())
                         .build())
                 .toList();
     }
@@ -47,6 +39,7 @@ public class BookMapper {
                 .isbn(book.getIsbn())
                 .valoracion(book.getValoracion())
                 .stock(book.getStock())
+                .price(book.getPrice())
                 .author(book.getAuthor() != null ? book.getAuthor().getName() : null)
                 .publisher(book.getPublisher().getName())
                 .category(book.getCategory().getName())
@@ -54,7 +47,7 @@ public class BookMapper {
                 .build();
     }
 
-    public Supply asSupply(Integer supplyId, WriteSupplyRequestDto supplyDto) {
+    /*public Supply asSupply(Integer supplyId, WriteSupplyRequestDto supplyDto) {
         Supply oldSupply = supplyJpaRepository.findById(supplyId).orElseThrow(
                 () -> new SupplyNotFoundException("Supply with ID " + supplyId + " not found.")
         );
@@ -123,5 +116,5 @@ public class BookMapper {
                         .imageUrl(imageUrl)
                         .build())
                 .toList();
-    }
+    }*/
 }

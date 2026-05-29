@@ -17,6 +17,7 @@ import java.util.List;
         "isbn",
         "valoracion",
         "stock",
+        "price",
         "author",
         "publisher",
         "category",
@@ -43,6 +44,8 @@ public class GetBookResponseDto implements Serializable {
     public BigDecimal valoracion;
     @JsonProperty("stock")
     public Integer stock;
+    @JsonProperty("price")
+    public BigDecimal price;
     @JsonProperty("author")
     public String author;
     @JsonProperty("publisher")

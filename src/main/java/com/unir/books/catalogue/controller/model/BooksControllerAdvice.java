@@ -1,17 +1,16 @@
-package com.unir.supplies.orders.controller;
+package com.unir.books.catalogue.controller.model;
 
-import com.unir.supplies.orders.controller.model.ErrorResponse;
-import com.unir.supplies.orders.exception.SupplyNotFoundException;
+import com.unir.books.catalogue.exception.BookNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
-public class SuppliesControllerAdvice {
+public class BooksControllerAdvice {
 
-    @ExceptionHandler(SupplyNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleSupplyNotFound(SupplyNotFoundException ex) {
+    @ExceptionHandler(BookNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSupplyNotFound(BookNotFoundException ex) {
          return ResponseEntity
                  .status(HttpStatus.NOT_FOUND)
                  .body(ErrorResponse.builder()
