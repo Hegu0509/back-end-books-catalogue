@@ -19,7 +19,7 @@ public class Author {
 
     @Id
     @Column(name = "id", length = 40, nullable = false)
-    private String id;
+    private Long id;
 
     @Column(name = "name", length = 150, nullable = false)
     private String name;

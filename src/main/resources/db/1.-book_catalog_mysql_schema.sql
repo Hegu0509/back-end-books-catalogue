@@ -31,7 +31,7 @@ CREATE TABLE publishers (
 -- Tabla: authors
 -- ============================================================
 CREATE TABLE authors (
-    id VARCHAR(40) NOT NULL,
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name VARCHAR(150) NOT NULL,
     biography TEXT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -64,7 +64,7 @@ CREATE TABLE books (
     description TEXT NULL,
     short_description VARCHAR(500) NULL,
 
-    author_id VARCHAR(40) NOT NULL,
+    author_id BIGINT UNSIGNED NOT NULL,
     publisher_id BIGINT UNSIGNED NOT NULL,
     category_id BIGINT UNSIGNED NOT NULL,
 
