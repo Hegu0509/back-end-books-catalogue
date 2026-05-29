@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +79,13 @@ public class Book {
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Image> images = new ArrayList<>();
+
+    @Column(name ="created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name ="updated_at")
+    private LocalDateTime updatedAt;
+
 
     public List<String> getImageUrls() {
         if (images == null) {

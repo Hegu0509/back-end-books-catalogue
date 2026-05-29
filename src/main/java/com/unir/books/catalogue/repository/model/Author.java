@@ -18,6 +18,7 @@ import java.util.List;
 public class Author {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", length = 40, nullable = false)
     private Long id;
 
@@ -30,4 +31,8 @@ public class Author {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = false)
     @Builder.Default
     private List<Book> books = new ArrayList<>();
+
+    public Author(Long authorId) {
+        this.id = authorId;
+    }
 }

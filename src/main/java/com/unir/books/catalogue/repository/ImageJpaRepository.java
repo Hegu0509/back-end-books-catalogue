@@ -11,10 +11,10 @@ import java.util.List;
 @Repository
 public interface ImageJpaRepository extends JpaRepository<Image, Integer> {
 
-    List<Image> findByBookId(Integer bookId);
+    List<Image> findByBookId(Long bookId);
 
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM images WHERE book_id = ?1")
-    void deleteBySupplyId(Integer bookId);
+    void deleteByBookId(Long bookId);
 
 }

@@ -129,7 +129,7 @@ CREATE TABLE images (
     book_id BIGINT UNSIGNED NOT NULL,
     image_url VARCHAR(1000) NOT NULL,
     image_type VARCHAR(80) NOT NULL DEFAULT 'cover',
-    image_order INT UNSIGNED NOT NULL DEFAULT 1,
+    image_order INT UNSIGNED NULL DEFAULT 1,
     alt_text VARCHAR(255) NULL,
 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

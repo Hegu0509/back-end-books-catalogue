@@ -2,12 +2,18 @@ package com.unir.books.catalogue.utils;
 
 import com.unir.books.catalogue.controller.model.BookDto;
 import com.unir.books.catalogue.controller.model.GetBookResponseDto;
-import com.unir.books.catalogue.repository.BookJpaRepository;
-import com.unir.books.catalogue.repository.ImageJpaRepository;
-import com.unir.books.catalogue.repository.model.Book;
+import com.unir.books.catalogue.controller.model.ImageDto;
+import com.unir.books.catalogue.controller.model.WriteBookRequestDto;
+import com.unir.books.catalogue.exception.AuthorNotFoundException;
+import com.unir.books.catalogue.exception.BookNotFoundException;
+import com.unir.books.catalogue.exception.PublisherNotFoundException;
+import com.unir.books.catalogue.repository.*;
+import com.unir.books.catalogue.repository.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -15,6 +21,9 @@ import java.util.List;
 public class BookMapper {
 
     private final BookJpaRepository bookJpaRepository;
+    private final AuthorJpaRepository authorJpaRepository;
+    private final PublisherJpaRepository publisherJpaRepository;
+    private  final CategoryJpaRepository categoryJpaRepository;
     private final ImageJpaRepository imageJpaRepository;
 
     public List<BookDto> asBookDtoList(List<Book> books) {
@@ -47,74 +56,76 @@ public class BookMapper {
                 .build();
     }
 
-    /*public Supply asSupply(Integer supplyId, WriteSupplyRequestDto supplyDto) {
-        Supply oldSupply = supplyJpaRepository.findById(supplyId).orElseThrow(
-                () -> new SupplyNotFoundException("Supply with ID " + supplyId + " not found.")
+    public Book asBook(Long bookId, WriteBookRequestDto bookDto) {
+        Book oldBook = bookJpaRepository.findById(bookId).orElseThrow(
+                () -> new BookNotFoundException("Book with ID " + bookId + " not found.")
         );
-        return Supply.builder()
-                .name(supplyDto.getName())
-                .description(supplyDto.getDescription())
-                .fullDescription(supplyDto.getFullDescription())
-                .type(supplyDto.getType())
-                .price(BigDecimal.valueOf(supplyDto.getPrice()))
-                .stock(supplyDto.getStock())
-                .specifications(getSpecificationsFromDto(oldSupply, supplyDto.getSpecificationDtos()))
-                .images(getImagesFromDto(oldSupply, supplyDto.getImages()))
+        return Book.builder()
+                .isbn(bookDto.getIsbn())
+                .title(bookDto.getTitle())
+                .description(bookDto.getDescription())
+                .shortDescription(bookDto.getShortDescription())
+                .publicationDate(bookDto.getPublicationDate())
+                .edition(bookDto.getEdition())
+                .language(bookDto.getLanguage())
+                .format(bookDto.getFormat())
+                .pages(bookDto.getPages())
+                .price(bookDto.getPrice() != null ? bookDto.getPrice() : BigDecimal.ZERO)
+                .stock(bookDto.getStock() != null ? bookDto.getStock() : 0)
+                .author(getAuthorFromDto(bookDto.getAuthorId()))
+                .publisher(getPublisherFromDto(bookDto.getPublisherId()))
+                .category(getCategoryFromDto(bookDto.getCategoryId()))
+                .images(getImagesFromDto(oldBook, bookDto.getImages()))
+                .visible(oldBook.getVisible())
+                .valoracion(oldBook.getValoracion())
+                .createdAt(oldBook.getCreatedAt())
+                .updatedAt(java.time.LocalDateTime.now())
                 .build();
     }
 
-    public Supply asSupply(GetSupplyResponseDto getSupplyResponseDto) {
-        Supply oldSupply = supplyJpaRepository.findById(getSupplyResponseDto.getId()).orElseThrow(
-                () -> new SupplyNotFoundException("Supply with ID " + getSupplyResponseDto.getId() + " not found.")
+    public Book asBook(GetBookResponseDto getBookResponseDto) {
+        Book oldBook = bookJpaRepository.findById(getBookResponseDto.getId()).orElseThrow(
+                () -> new BookNotFoundException("Supply with ID " + getBookResponseDto.getId() + " not found.")
         );
-        return Supply.builder()
-                .id(getSupplyResponseDto.getId())
-                .name(getSupplyResponseDto.getName())
-                .description(getSupplyResponseDto.getDescription())
-                .fullDescription(getSupplyResponseDto.getFullDescription())
-                .type(getSupplyResponseDto.getType())
-                .price(getSupplyResponseDto.getPrice() != null ? BigDecimal.valueOf(getSupplyResponseDto.getPrice()) : null)
-                .stock(getSupplyResponseDto.getStock())
-                .specifications(getSpecificationsFromDto(oldSupply, getSupplyResponseDto.getSpecificationDtos()))
-                .images(getImagesFromDto(oldSupply, getSupplyResponseDto.getImages()))
+        return Book.builder()
+                .id(getBookResponseDto.getId())
+                .isbn(getBookResponseDto.getIsbn())
+                .title(getBookResponseDto.getTitle())
+                .description(getBookResponseDto.getDescription())
+                .price(getBookResponseDto.getPrice() != null ? getBookResponseDto.getPrice() : BigDecimal.ZERO)
+                .stock(getBookResponseDto.getStock() != null ? getBookResponseDto.getStock() : 0)
+                .visible(oldBook.getVisible())
+                .valoracion(oldBook.getValoracion())
+                .createdAt(oldBook.getCreatedAt())
+                .updatedAt(java.time.LocalDateTime.now())
                 .build();
     }
 
-    private List<SupplySpecification> getSpecificationsFromDto(Supply oldSupply, List<SpecificationDto> specificationDtos) {
-        specificationJpaRepository.deleteBySupplyId(oldSupply.getId());
-        return specificationDtos.stream()
-                .map(spec -> SupplySpecification.builder()
-                        .supply(oldSupply)
-                        .specKey(spec.getSpecKey())
-                        .specValue(spec.getSpecValue())
-                        .build())
-                .toList();
+    private Author getAuthorFromDto(Long authorId) {
+        return authorJpaRepository.findById(authorId).orElseThrow(() -> new AuthorNotFoundException("Author not found with id: " + authorId));
     }
 
-    private List<SupplyImage> getImagesFromDto(Supply oldSupply, List<String> images) {
-        imageJpaRepository.deleteBySupplyId(oldSupply.getId());
-        return images.stream()
-                .map(imageUrl -> SupplyImage.builder()
-                        .supply(oldSupply)
-                        .imageUrl(imageUrl)
-                        .build())
-                .toList();
+    private Publisher getPublisherFromDto(Long publisherId) {
+        return publisherJpaRepository.findById(publisherId).orElseThrow(() -> new PublisherNotFoundException("Publisher not found with id: " + publisherId));
     }
 
-    public List<SupplySpecification> mapSpecifications(Map<String, String> specifications) {
-        return specifications.entrySet().stream()
-                .map(entry -> SupplySpecification.builder()
-                        .specKey(entry.getKey())
-                        .specValue(entry.getValue())
-                        .build())
-                .toList();
+    private Category getCategoryFromDto(Long categoryId) {
+        return categoryJpaRepository.findById(categoryId).orElseThrow(() -> new AuthorNotFoundException("Category not found with id: " + categoryId));
     }
 
-    public List<SupplyImage> mapImages(List<String> images) {
-        return images.stream()
-                .map(imageUrl -> SupplyImage.builder()
-                        .imageUrl(imageUrl)
-                        .build())
-                .toList();
-    }*/
+    private List<Image> getImagesFromDto(Book oldBook, List<ImageDto> imagesDto) {
+        imageJpaRepository.deleteByBookId(oldBook.getId());
+        List<Image> images = new ArrayList<>();
+        imagesDto.forEach(image -> {
+            Image imageModified = Image.builder()
+                    .book(oldBook)
+                    .imageUrl(image.getImageUrl() != null && !image.getImageUrl().isEmpty() ? image.getImageUrl() : "Sin imagen")
+                    .imageType(image.getImageType() != null ? image.getImageType() : "cover")
+                    .imageOrder(image.getImageOrder()!= null ? image.getImageOrder() : null)
+                    .altText(image.getAltText() != null ? image.getAltText() : null)
+                    .build();
+            images.add(imageModified);
+        });
+        return images;
+    }
 }

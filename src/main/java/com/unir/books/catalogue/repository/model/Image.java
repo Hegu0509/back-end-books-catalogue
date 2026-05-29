@@ -28,7 +28,7 @@ public class Image {
     @Column(name = "image_type", length = 80, nullable = false)
     private String imageType;
 
-    @Column(name = "image_order", nullable = false)
+    @Column(name = "image_order")
     private Integer imageOrder;
 
     @Column(name = "alt_text", length = 255)

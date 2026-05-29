@@ -9,8 +9,12 @@ import java.io.Serializable;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "type",
-        "image"
+        "bookId",
+        "imageUrl",
+        "imageType",
+        "imageOrder",
+        "altText"
+
 })
 @Builder
 @Getter
@@ -21,9 +25,18 @@ public class ImageDto implements Serializable {
 
     private final static long serialVersionUID = 1901178943784643027L;
 
-    @JsonProperty("type")
-    private String type;
+    @JsonProperty("bookId")
+    private Long bookId;
 
-    @JsonProperty("image")
-    private String image;
+    @JsonProperty("imageUrl")
+    private String imageUrl;
+
+    @JsonProperty("imageType")
+    private String imageType;
+
+    @JsonProperty("imageOrder")
+    private Integer imageOrder;
+
+    @JsonProperty("altText")
+    private String altText;
 }
